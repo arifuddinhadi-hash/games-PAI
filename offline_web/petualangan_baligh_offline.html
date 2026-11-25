@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Petualangan Baligh (Versi Offline) - PAI Kelas 4 SD</title>
+<style>
+  :root {
+    --primary: #167766;
+    --primary-light: #C7F2E4;
+    --secondary: #D98218;
+    --secondary-light: #FFE8C2;
+    --coral: #D85C68;
+    --blue: #2D7DD2;
+    --green: #1E8E5A;
+    --green-bg: #D3F4E2;
+    --warn-bg: #FFF0D4;
+    --bg: #FBF9F2;
+    --surface: #FFFFFF;
+    --text: #1D2623;
+    --muted: #4C5954;
+    --border: #DDD7C8;
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+  }
+  body.large-text { font-size: 18px; }
+  header {
+    position: sticky; top: 0; z-index: 20;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; color: var(--primary); font-size: 1.1rem; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 11px; border-radius: 999px; font-size: 0.82rem; font-weight: 700;
+  }
+  .pill-xp { background: var(--secondary-light); color: #593100; }
+  .pill-badge { background: var(--primary-light); color: #063B30; }
+  .pill-offline { background: #E6F5EF; color: var(--primary); border: 1px solid #9AD8C4; }
+  .container { max-width: 820px; margin: 0 auto; padding: 16px 16px 48px; }
+  .card {
+    background: var(--surface); border-radius: var(--radius);
+    border: 1px solid var(--border); padding: 18px; margin-bottom: 14px;
+    box-shadow: 0 2px 10px rgba(22,119,102,0.05);
+  }
+  .hero {
+    background: linear-gradient(135deg, #167766, #25967F);
+    color: #fff; border: none;
+  }
+  h1, h2, h3 { margin-top: 0; }
+  .btn {
+    border: none; border-radius: 14px; padding: 11px 16px;
+    font-weight: 700; cursor: pointer; font-size: 0.95rem;
+    min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    transition: transform 0.1s ease;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-secondary { background: var(--secondary); color: #fff; }
+  .btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
+  .btn-danger { background: #C94A4A; color: #fff; }
+  .btn-block { width: 100%; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  input, select {
+    width: 100%; padding: 11px 12px; border-radius: 12px;
+    border: 1.5px solid var(--border); font-size: 1rem; background: #fff;
+  }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .avatar-card {
+    border: 2px solid var(--border); border-radius: 16px; padding: 12px; text-align: center; cursor: pointer;
+    background: #fff;
+  }
+  .avatar-card.active { border-color: var(--primary); background: var(--primary-light); }
+  .avatar-icon {
+    width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 8px;
+    display: flex; align-items: center; justify-content: center; font-size: 1.8rem; background: #F4EFE2;
+  }
+  .tabs { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 12px; padding-bottom: 4px; }
+  .tab {
+    padding: 9px 14px; border-radius: 12px; border: 1px solid var(--border);
+    background: #fff; cursor: pointer; font-weight: 700; white-space: nowrap;
+  }
+  .tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .progress-bar { width: 100%; height: 10px; background: #E6E1D3; border-radius: 999px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--primary); transition: width 0.3s ease; }
+  .option-btn {
+    width: 100%; text-align: left; padding: 12px 14px; border-radius: 12px;
+    border: 1.5px solid var(--border); background: #fff; cursor: pointer; margin-bottom: 8px; font-size: 0.96rem;
+  }
+  .option-btn.correct { border-color: var(--green); background: var(--green-bg); font-weight: 700; }
+  .option-btn.wrong { border-color: var(--secondary); background: var(--warn-bg); }
+  .feedback { padding: 12px; border-radius: 12px; margin-top: 8px; }
+  .feedback.ok { background: var(--green-bg); color: #0B4A2D; }
+  .feedback.warn { background: var(--warn-bg); color: #5D3600; }
+  .pos-card { border-left: 6px solid var(--primary); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .locked { opacity: 0.6; }
+  .cert-box {
+    border: 6px double var(--primary); border-radius: 20px; padding: 28px; text-align: center; background: #fff;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  th, td { border-bottom: 1px solid var(--border); padding: 8px; text-align: left; }
+  th { background: var(--primary); color: #fff; }
+  @media print {
+    header, .no-print { display: none !important; }
+    body { background: #fff; }
+  }
+</style>
+</head>
+<body>
+<header class="no-print">
+  <div class="brand">
+    <span>🌙 Petualangan Baligh</span>
+    <span class="pill pill-offline">Offline 100%</span>
+  </div>
+  <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+    <span id="headerStats" style="display:none; gap:6px; align-items:center;">
+      <span class="pill pill-xp" id="hdrXp">0 XP</span>
+      <span class="pill pill-badge" id="hdrBadge">0 Lencana</span>
+    </span>
+    <button class="btn btn-outline" style="padding:6px 10px; min-height:36px;" onclick="toggleTextSize()" title="Perbesar Teks">Aa</button>
+    <button class="btn btn-outline" style="padding:6px 10px; min-height:36px;" onclick="showTrustedHelp()" title="Bantuan Aman">?</button>
+  </div>
+</header>
+
+<main class="container" id="app"></main>
+
+<script>
+// ============================================================================
+// DATA KURIKULUM & BANK SOAL (100% OFFLINE BUNDLED)
+// ============================================================================
+const STORAGE_KEY = "petualangan_baligh_offline_v1";
+
+const DEFAULT_STATE = {
+  settings: {
+    schoolName: "SD Negeri Nusantara",
+    teacherName: "Guru PAI",
+    className: "IV A",
+    kktp: 75,
+    freeLearningMode: false,
+    teacherPin: "4024"
+  },
+  students: [],
+  activeStudentId: null,
+  answers: [],
+  formativeResults: [],
+  summativeResults: [],
+  reflections: []
+};
+
+let state = loadState();
+let currentView = "home";
+let activePos = 1;
+let posSubTab = "materi";
+let teacherUnlocked = false;
+let teacherTab = "ringkasan";
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return structuredClone(DEFAULT_STATE);
+    return { ...structuredClone(DEFAULT_STATE), ...JSON.parse(raw) };
+  } catch {
+    return structuredClone(DEFAULT_STATE);
+  }
+}
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  updateHeader();
+}
+function activeStudent() {
+  return state.students.find(s => s.id === state.activeStudentId) || null;
+}
+
+const AVATARS = [
+  { id: "nara", name: "Nara", role: "Penjelajah Ilmu", icon: "🧭", msg: "Halo! Aku Nara. Yuk jelajahi 5 pos seru tentang tumbuh dewasa dengan hati gembira!" },
+  { id: "aisyah", name: "Aisyah", role: "Sahabat Petualangan", icon: "🌸", msg: "Assalamu'alaikum! Aku Aisyah. Kita belajar menjaga kebersihan, privasi, dan akhlak mulia." },
+  { id: "bimo", name: "Bimo", role: "Sahabat Petualangan", icon: "⭐", msg: "Hai teman! Aku Bimo. Ingat, waktu pertumbuhan setiap anak berbeda-beda dan semuanya normal!" }
+];
+
+const POS_DATA = [
+  {
+    num: 1, title: "Pos 1: Mengenal Baligh", color: "#167766", badge: "Bintang Awal Baligh",
+    story: "Nara dan teman-teman berada di gerbang Taman Ilmu. Yuk pahami arti baligh dan tanggung jawab awal seorang muslim!",
+    cards: [
+      { t: "Apa Itu Baligh?", b: "Baligh berasal dari bahasa Arab yang artinya 'sampai'. Dalam Islam, baligh berarti seseorang sampai pada tahap kedewasaan awal sehingga mulai memikul tanggung jawab ibadah secara mandiri (mukalaf)." },
+      { t: "Dari Anak-Anak ke Baligh", b: "Saat kecil kita berlatih salat dan puasa. Saat baligh, amal kebaikan menjadi tanggung jawab pribadi. Tidak perlu cemas, karena setiap anak punya waktu tumbuh masing-masing." },
+      { t: "Kewajiban Setelah Baligh", b: "Menjaga salat lima waktu, berpuasa Ramadan, menutup aurat, menjaga kebersihan, jujur, serta berbakti kepada orang tua dan guru." }
+    ],
+    gameTitle: "Cocokkan Istilah Baligh",
+    pairs: [
+      { term: "Baligh", def: "Sampai pada tahap kedewasaan awal dalam Islam" },
+      { term: "Mukalaf", def: "Muslim berakal dan baligh yang wajib menjalankan syariat" },
+      { term: "Salat 5 Waktu", def: "Kewajiban ibadah harian utama setelah baligh" },
+      { term: "Aurat", def: "Bagian tubuh yang wajib ditutup secara sopan" }
+    ]
+  },
+  {
+    num: 2, title: "Pos 2: Tanda-Tanda Baligh", color: "#2D7DD2", badge: "Detektif Ilmu Santun",
+    story: "Aisyah dan Bimo membaca papan ilmu fikih & sains. Mari kenali tanda-tanda baligh secara santun, ilmiah, dan tanpa membandingkan teman.",
+    cards: [
+      { t: "Tiga Tanda Baligh Menurut Fikih", b: "1) Mimpi basah (ihtilam) bagi laki-laki. 2) Haid (menstruasi) bagi perempuan. 3) Mencapai usia 15 tahun hijriah apabila dua tanda sebelumnya belum dialami." },
+      { t: "Haid & Mimpi Basah Secara Santun", b: "Keduanya adalah proses alami tubuh yang sehat saat beranjak remaja, bukan penyakit dan bukan aib. Jika mengalaminya, ceritakan kepada orang tua atau guru terpercaya." },
+      { t: "Setiap Anak Unik", b: "Waktu perkembangan tiap anak tidak sama. Dilarang menertawakan atau membandingkan perubahan tubuh teman." }
+    ],
+    gameTitle: "Benar atau Salah Detektif Fikih",
+    tfItems: [
+      { q: "Mimpi basah adalah tanda baligh alami pada anak laki-laki.", a: true },
+      { q: "Haid pada anak perempuan adalah penyakit menular.", a: false },
+      { q: "Jika belum haid atau mimpi basah, usia baligh fikih adalah 15 tahun hijriah.", a: true },
+      { q: "Semua anak kelas 4 pasti mengalami tanda baligh pada hari yang sama.", a: false }
+    ]
+  },
+  {
+    num: 3, title: "Pos 3: Aku Menjaga Kebersihan", color: "#2A9D68", badge: "Penjaga Kesucian",
+    story: "Bimo mengajakmu ke Mata Air Jernih! Ayo pelajari kebersihan diri dan urutan langkah mandi wajib agar ibadah selalu sah.",
+    cards: [
+      { t: "Kebersihan Bagian dari Iman", b: "Mandi dua kali sehari memakai sabun, mengganti baju bersih setelah berkeringat, dan merapikan kamar serta tempat ibadah." },
+      { t: "Hadas Besar & Mandi Wajib", b: "Setelah selesai haid atau mengalami mimpi basah, seorang muslim bersuci dengan mandi wajib menggunakan air bersih yang suci menyucikan." },
+      { t: "Urutan Mandi Wajib Ringkas", b: "1. Niat dalam hati karena Allah -> 2. Cuci kedua tangan -> 3. Bersihkan bagian kotor -> 4. Berwudu -> 5. Siram kepala 3x & seluruh tubuh kanan ke kiri merata." }
+    ],
+    gameTitle: "Susun Langkah Mandi Wajib",
+    steps: [
+      "Membaca niat mandi wajib dalam hati karena Allah Ta'ala",
+      "Mencuci kedua telapak tangan hingga bersih",
+      "Membersihkan bagian tubuh yang kotor dengan air bersih",
+      "Berwudu sempurna seperti wudu hendak salat",
+      "Menyiram kepala 3x lalu seluruh tubuh dari kanan ke kiri hingga rata"
+    ]
+  },
+  {
+    num: 4, title: "Pos 4: Aku Menjaga Diri & Privasi", color: "#D85C68", badge: "Perisai Privasi & Hormat",
+    story: "Di Benteng Kehormatan, Aisyah mengingatkan pentingnya menutup aurat, menjaga batasan diri, dan berinternet dengan aman.",
+    cards: [
+      { t: "Menjaga Aurat", b: "Aurat laki-laki: antara pusar hingga lutut. Aurat perempuan: seluruh tubuh kecuali wajah dan kedua telapak tangan." },
+      { t: "Batasan Tubuh & Orang Tepercaya", b: "Tidak boleh memaksa teman bercerita tentang tubuhnya atau mengejeknya. Jika merasa tidak aman atau nyaman, katakan TIDAK, menjauh, dan lapor ke orang tua atau guru." },
+      { t: "Privasi Digital", b: "Jangan bagikan alamat rumah, nomor telepon, kata sandi, atau foto teman tanpa izin di internet atau gim daring." }
+    ],
+    gameTitle: "Pilih Keputusan Aman",
+    scenarios: [
+      { s: "Akun asing di gim daring menanyakan alamat rumah dan foto seragammu.", opts: ["Tolak, blokir akun, dan lapor ke orang tua", "Kirim alamat rumah agar dapat koin"], best: 0 },
+      { s: "Teman bercanda menertawakan perubahan suara teman lain.", opts: ["Ikut menertawakan", "Ingatkan dengan sopan agar saling menghargai"], best: 1 },
+      { s: "Kamu bingung soal tata cara bersuci setelah baligh.", opts: ["Bertanya ke orang tua atau guru PAI", "Percaya komentar acak di media sosial"], best: 0 }
+    ]
+  },
+  {
+    num: 5, title: "Pos 5: Muslim yang Bertanggung Jawab", color: "#D98218", badge: "Duta Akhlak Baligh",
+    story: "Selamat datang di Puncak Menara Cita-Cita! Saatnya merangkum 7 sikap muslim bertanggung jawab.",
+    cards: [
+      { t: "Ibadah & Ilmu", b: "Menjaga salat 5 waktu tepat waktu atas kesadaran sendiri, rajin mengaji, dan berani bertanya sopan kepada guru PAI." },
+      { t: "Akhlak & Percaya Diri", b: "Menghormati orang tua & guru, menyayangi teman, bersyukur atas karunia pertumbuhan, dan rajin berdoa." }
+    ],
+    gameTitle: "Aktifkan 7 Sikap Muslim Bertanggung Jawab",
+    attitudes: [
+      "1. Menjaga salat 5 waktu tepat waktu",
+      "2. Mandi bersih & menjaga kesucian diri",
+      "3. Menutup aurat dengan pakaian sopan",
+      "4. Hormat & santun kepada orang tua dan guru",
+      "5. Menghargai perbedaan teman tanpa mengejek",
+      "6. Berani bertanya ke orang dewasa tepercaya",
+      "7. Jujur, amanah, dan bersyukur kepada Allah Swt."
+    ]
+  }
+];
+
+const DIAGNOSTIC_QS = [
+  { id: "DIAG-01", pos: 1, q: "Dalam pelajaran PAI, 'baligh' berarti seseorang memasuki tahap...", opts: ["Bayi", "Kedewasaan awal", "Masa pensiun"], ans: "Kedewasaan awal" },
+  { id: "DIAG-02", pos: 1, q: "Ibadah wajib lima kali sehari bagi muslim yang baligh adalah...", opts: ["Salat fardu", "Piknik", "Lomba lari"], ans: "Salat fardu" },
+  { id: "DIAG-03", pos: 2, q: "Benar atau Salah: Waktu pertumbuhan setiap anak bisa berbeda-beda.", opts: ["Benar", "Salah"], ans: "Benar" },
+  { id: "DIAG-04", pos: 2, q: "Tanda baligh alami bagi anak perempuan menurut fikih adalah...", opts: ["Haid", "Gigi susu", "Mengantuk"], ans: "Haid" },
+  { id: "DIAG-05", pos: 3, q: "Kebersihan tubuh dan pakaian dalam Islam merupakan bagian dari...", opts: ["Iman", "Kemalasan", "Hukuman"], ans: "Iman" },
+  { id: "DIAG-06", pos: 3, q: "Benar atau Salah: Hadas besar disucikan dengan mandi wajib memakai air bersih.", opts: ["Benar", "Salah"], ans: "Benar" },
+  { id: "DIAG-07", pos: 4, q: "Pakaian yang baik saat keluar rumah adalah yang...", opts: ["Sopan dan menutup aurat", "Sangat tipis", "Tidak rapi"], ans: "Sopan dan menutup aurat" },
+  { id: "DIAG-08", pos: 4, q: "Jika bingung tentang tanda baligh, sebaiknya bertanya kepada...", opts: ["Orang tua atau guru PAI", "Orang asing di internet"], ans: "Orang tua atau guru PAI" },
+  { id: "DIAG-09", pos: 4, q: "Benar atau Salah: Alamat rumah dan kata sandi boleh dibagikan ke orang asing.", opts: ["Benar", "Salah"], ans: "Salah" },
+  { id: "DIAG-10", pos: 5, q: "Saat melihat teman bertumbuh lebih cepat atau lambat, sikap kita adalah...", opts: ["Menghargai dan tetap bersahabat", "Mengejeknya"], ans: "Menghargai dan tetap bersahabat" }
+];
+
+const FORMATIVE_QS = {
+  1: [
+    { id: "F1-1", q: "Secara bahasa Arab, 'baligh' artinya...", opts: ["Sampai", "Cepat", "Diam", "Kembali"], ans: "Sampai" },
+    { id: "F1-2", q: "Sebutan muslim yang berakal & baligh sehingga wajib menjalankan syariat adalah...", opts: ["Mukalaf", "Musafir", "Mualaf", "Mubazir"], ans: "Mukalaf" },
+    { id: "F1-3", q: "Benar/Salah: Salat 5 waktu menjadi tanggung jawab pribadi saat sudah baligh.", opts: ["Benar", "Salah"], ans: "Benar" },
+    { id: "F1-4", q: "Jika teman cemas mendengar kata baligh, nasihat terbaik adalah...", opts: ["Baligh itu tahap alami agar makin mandiri", "Harus sembunyi", "Baligh itu hukuman"], ans: "Baligh itu tahap alami agar makin mandiri" },
+    { id: "F1-5", q: "Kewajiban lain setelah baligh selain salat 5 waktu adalah...", opts: ["Puasa Ramadan & menutup aurat", "Bermain sepanjang malam", "Menunda tugas"], ans: "Puasa Ramadan & menutup aurat" }
+  ],
+  2: [
+    { id: "F2-1", q: "Tanda baligh menurut fikih bagi laki-laki saat tidur adalah...", opts: ["Mimpi basah", "Mengigau", "Demam", "Gigi goyang"], ans: "Mimpi basah" },
+    { id: "F2-2", q: "Tanda baligh alami bagi anak perempuan adalah...", opts: ["Haid (menstruasi)", "Suara serak", "Rambut memendek", "Mengantuk"], ans: "Haid (menstruasi)" },
+    { id: "F2-3", q: "Batas usia baligh menurut fikih jika dua tanda sebelumnya belum dialami adalah...", opts: ["15 tahun hijriah", "7 tahun", "25 tahun", "5 tahun"], ans: "15 tahun hijriah" },
+    { id: "F2-4", q: "Benar/Salah: Teman yang belum berubah suaranya berarti sakit.", opts: ["Benar", "Salah"], ans: "Salah" },
+    { id: "F2-5", q: "Sumber tepercaya untuk bertanya tentang persiapan haid/mimpi basah adalah...", opts: ["Orang tua atau guru PAI", "Komentar medsos", "Menebak sendiri"], ans: "Orang tua atau guru PAI" }
+  ],
+  3: [
+    { id: "F3-1", q: "Kebiasaan bersih setelah olahraga adalah...", opts: ["Mandi pakai sabun & ganti baju bersih", "Tidur dengan baju basah", "Pakai parfum saja"], ans: "Mandi pakai sabun & ganti baju bersih" },
+    { id: "F3-2", q: "Mandi wajib dilakukan oleh muslim apabila...", opts: ["Selesai haid atau mengalami mimpi basah", "Selesai makan", "Sebelum olahraga"], ans: "Selesai haid atau mengalami mimpi basah" },
+    { id: "F3-3", q: "Langkah pertama sebelum menyiram air saat mandi wajib adalah...", opts: ["Membaca niat dalam hati karena Allah", "Mengeringkan handuk", "Memakai sepatu"], ans: "Membaca niat dalam hati karena Allah" },
+    { id: "F3-4", q: "Benar/Salah: Saat haid tetap boleh berdoa dan berzikir.", opts: ["Benar", "Salah"], ans: "Benar" },
+    { id: "F3-5", q: "Panduan bersuci terbaik berasal dari...", opts: ["Guru PAI, orang tua, & buku fikih sekolah", "Rumor internet", "Iklan"], ans: "Guru PAI, orang tua, & buku fikih sekolah" }
+  ],
+  4: [
+    { id: "F4-1", q: "Batas aurat anak laki-laki adalah...", opts: ["Antara pusar sampai lutut", "Rambut saja", "Telapak tangan saja"], ans: "Antara pusar sampai lutut" },
+    { id: "F4-2", q: "Benar/Salah: Memaksa teman bercerita soal perubahan tubuh melanggar privasi.", opts: ["Benar", "Salah"], ans: "Benar" },
+    { id: "F4-3", q: "Jika ada sentuhan tidak pantas yang membuat tidak aman, langkahmu adalah...", opts: ["Katakan Tidak, menjauh, & lapor orang tua/guru", "Diam saja", "Menuruti"], ans: "Katakan Tidak, menjauh, & lapor orang tua/guru" },
+    { id: "F4-4", q: "Informasi yang dilarang disebar ke internet adalah...", opts: ["Alamat rumah, nomor HP, & kata sandi", "Gambar gunung", "Foto buku"], ans: "Alamat rumah, nomor HP, & kata sandi" },
+    { id: "F4-5", q: "Sebelum mengunggah foto bersama teman, kita wajib...", opts: ["Meminta izin teman & orang tua", "Langsung unggah", "Menambahkan alamat rumah"], ans: "Meminta izin teman & orang tua" }
+  ],
+  5: [
+    { id: "F5-1", q: "Sikap bertanggung jawab saat mendengar azan adalah...", opts: ["Segera berwudu dan salat", "Menunda hingga habis waktu", "Pura-pura tidak dengar"], ans: "Segera berwudu dan salat" },
+    { id: "F5-2", q: "Benar/Salah: Bertanya sopan kepada guru PAI saat kesulitan adalah perbuatan terpuji.", opts: ["Benar", "Salah"], ans: "Benar" },
+    { id: "F5-3", q: "Perasaan terbaik menyikapi pertumbuhan diri adalah...", opts: ["Bersyukur & percaya diri", "Takut berlebihan", "Sombong"], ans: "Bersyukur & percaya diri" },
+    { id: "F5-4", q: "Jika ada teman baru yang pemalu, sikapmu adalah...", opts: ["Menyapa ramah & mengajak belajar bersama", "Membiarkannya", "Mengejeknya"], ans: "Menyapa ramah & mengajak belajar bersama" },
+    { id: "F5-5", q: "Kebiasaan rohani agar hati tenang dan terlindungi saat bertumbuh adalah...", opts: ["Berdoa dan membaca Al-Qur'an", "Marah-marah", "Membantah"], ans: "Berdoa dan membaca Al-Qur'an" }
+  ]
+};
+
+const SUMMATIVE_QS = [
+  { id: "SUM-01", pos: 1, q: "Arti kata 'baligh' menurut bahasa Arab adalah...", opts: ["Sampai", "Permulaan", "Kecil", "Istirahat"], ans: "Sampai" },
+  { id: "SUM-02", pos: 1, q: "Muslim berakal dan baligh yang wajib menjalankan syariat disebut...", opts: ["Mukalaf", "Muadzin", "Makmum", "Musafir"], ans: "Mukalaf" },
+  { id: "SUM-03", pos: 1, q: "Kewajiban saat baligh KECUALI...", opts: ["Membayar biaya sekolah sendiri", "Salat 5 waktu", "Puasa Ramadan", "Menutup aurat"], ans: "Membayar biaya sekolah sendiri" },
+  { id: "SUM-04", pos: 2, q: "Tanda baligh laki-laki berupa keluarnya cairan alami saat tidur disebut...", opts: ["Mimpi basah", "Berkeringat", "Mengigau", "Demam"], ans: "Mimpi basah" },
+  { id: "SUM-05", pos: 2, q: "Pengertian haid yang benar adalah...", opts: ["Keluarnya darah alami berkala tanda tubuh sehat", "Penyakit menular", "Luka jatuh", "Hal menakutkan"], ans: "Keluarnya darah alami berkala tanda tubuh sehat" },
+  { id: "SUM-06", pos: 2, q: "Jika belum haid/mimpi basah, usia baligh menurut fikih adalah...", opts: ["15 tahun hijriah", "10 tahun", "20 tahun", "8 tahun"], ans: "15 tahun hijriah" },
+  { id: "SUM-07", pos: 2, q: "Mengapa tidak boleh membandingkan pertumbuhan tubuh teman?", opts: ["Waktu tumbuh tiap anak berbeda dan normal", "Teman bukan saudara", "Tinggi tidak berubah", "Liburan sekolah"], ans: "Waktu tumbuh tiap anak berbeda dan normal" },
+  { id: "SUM-08", pos: 3, q: "Cara menjaga kebersihan diri sehari-hari adalah...", opts: ["Mandi pakai sabun & ganti baju bersih", "Pakai baju sama seminggu", "Tidak cuci tangan", "Tumpuk sampah"], ans: "Mandi pakai sabun & ganti baju bersih" },
+  { id: "SUM-09", pos: 3, q: "Cara bersuci setelah selesai haid atau mimpi basah adalah...", opts: ["Mandi wajib", "Cuci muka saja", "Sisir rambut", "Tepuk tangan"], ans: "Mandi wajib" },
+  { id: "SUM-10", pos: 3, q: "Saat mandi wajib, air harus disiramkan merata ke...", opts: ["Kulit kepala dan seluruh anggota tubuh", "Tangan saja", "Kaki saja", "Punggung saja"], ans: "Kulit kepala dan seluruh anggota tubuh" },
+  { id: "SUM-11", pos: 4, q: "Aurat perempuan muslimah adalah...", opts: ["Seluruh tubuh kecuali wajah dan kedua telapak tangan", "Lutut ke kaki", "Wajah saja", "Leher saja"], ans: "Seluruh tubuh kecuali wajah dan kedua telapak tangan" },
+  { id: "SUM-12", pos: 4, q: "Jika teman belum mau bercerita tentang hal pribadinya, sikap kita adalah...", opts: ["Menghormati & tidak memaksa", "Terus mendesak", "Bergosip", "Menertawakan"], ans: "Menghormati & tidak memaksa" },
+  { id: "SUM-13", pos: 4, q: "Tindakan menjaga privasi digital adalah...", opts: ["Tidak sebar foto teman tanpa izin & jaga kata sandi", "Pasang alamat di bio", "Temui orang asing", "Sebar nomor HP"], ans: "Tidak sebar foto teman tanpa izin & jaga kata sandi" },
+  { id: "SUM-14", pos: 5, q: "Perilaku siap bertanggung jawab di usia baligh adalah...", opts: ["Salat 5 waktu atas kesadaran sendiri & jujur", "Belajar kalau diawasi", "Menunda salat", "Membantah"], ans: "Salat 5 waktu atas kesadaran sendiri & jujur" },
+  { id: "SUM-15", pos: 5, q: "Jika ragu tentang tata cara ibadah, langkah tepat adalah...", opts: ["Bertanya sopan ke orang tua atau guru PAI", "Berhenti ibadah", "Ikut tebakan acak", "Tertawa"], ans: "Bertanya sopan ke orang tua atau guru PAI" },
+  { id: "SUM-16", pos: 2, q: "Benar atau Salah: Anak perempuan yang sedang haid tetap boleh berdoa & berzikir.", opts: ["Benar", "Salah"], ans: "Benar" },
+  { id: "SUM-17", pos: 3, q: "Benar atau Salah: Mandi wajib sah meski lupa niat.", opts: ["Benar", "Salah"], ans: "Salah" },
+  { id: "SUM-18", pos: 4, q: "Benar atau Salah: Mengejek perubahan fisik teman dilarang agama.", opts: ["Benar", "Salah"], ans: "Benar" },
+  { id: "SUM-19", pos: 4, q: "Situasi: Akun asing meminta fotomu dengan iming-iming hadiah gim. Sikapmu:", opts: ["Tolak, blokir akun, dan lapor orang tua", "Kirim alamat sekolah", "Kirim foto tanpa nama"], ans: "Tolak, blokir akun, dan lapor orang tua" },
+  { id: "SUM-20", pos: 5, q: "Jawaban Singkat: Tuliskan satu kata berawalan 'M' untuk muslim yang sudah baligh dan wajib beribadah:", type: "short", opts: [], ans: "Mukalaf" }
+];
+
+// ============================================================================
+// RENDER ENGINE
+// ============================================================================
+function updateHeader() {
+  const s = activeStudent();
+  const el = document.getElementById("headerStats");
+  if (s) {
+    el.style.display = "inline-flex";
+    document.getElementById("hdrXp").textContent = `${s.xp} XP`;
+    document.getElementById("hdrBadge").textContent = `${s.badges.length} Lencana`;
+  } else {
+    el.style.display = "none";
+  }
+}
+
+function toggleTextSize() {
+  document.body.classList.toggle("large-text");
+}
+
+function showTrustedHelp() {
+  alert("Kamu Tidak Sendirian!\n\nJika merasa bingung tentang tanda baligh, cara bersuci, atau ada hal yang membuatmu tidak nyaman:\n• Bertanyalah kepada Ayah, Ibu, atau Guru PAI.\n• Jangan membandingkan diri dengan teman.\n• Jangan bagikan data pribadi di internet.");
+}
+
+function render() {
+  updateHeader();
+  const root = document.getElementById("app");
+  if (currentView === "home") renderHome(root);
+  else if (currentView === "map") renderMap(root);
+  else if (currentView === "pos") renderPos(root);
+  else if (currentView === "diagnostic") renderQuizView(root, "Asesmen Diagnostik (10 Soal)", DIAGNOSTIC_QS, "diag");
+  else if (currentView === "summative") renderQuizView(root, "Kuis Akhir Sumatif (20 Soal)", SUMMATIVE_QS, "sum");
+  else if (currentView === "cert") renderCertificate(root);
+  else if (currentView === "reflection") renderReflection(root);
+  else if (currentView === "teacher") renderTeacher(root);
+}
+
+function renderHome(root) {
+  const cur = activeStudent();
+  const avCards = AVATARS.map(a => `
+    <div class="avatar-card ${window._pickedAv === a.id ? 'active' : ''}" onclick="window._pickedAv='${a.id}'; render();">
+      <div class="avatar-icon">${a.icon}</div>
+      <strong>${a.name}</strong><br><small>${a.role}</small>
+    </div>
+  `).join("");
+
+  if (!window._pickedAv) window._pickedAv = "nara";
+
+  root.innerHTML = `
+    <div class="card hero">
+      <h1>Petualangan Baligh (Versi Offline)</h1>
+      <p>Aku Siap Tumbuh Menjadi Muslim yang Bertanggung Jawab • PAI Kelas IV SD (Fase B)</p>
+      <small>Semua materi, game, kuis, sertifikat, dan rekap guru berjalan 100% di perangkat tanpa koneksi internet.</small>
+    </div>
+
+    ${cur ? `
+    <div class="card" style="background:#E6F5EF; border-color:#167766; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+      <div>
+        <strong>Lanjutkan Petualangan: ${esc(cur.nickname)}</strong><br>
+        <small>Kelas ${esc(cur.className)} • ${cur.completedPos.length}/5 Pos • ${cur.xp} XP</small>
+      </div>
+      <button class="btn btn-primary" onclick="currentView='map'; render();">Lanjut ke Peta</button>
+    </div>` : ""}
+
+    <div class="card">
+      <h3>Daftar Penjelajah Baru</h3>
+      <p><small>Cukup isi nama panggilan atau kode murid (tanpa data pribadi lengkap).</small></p>
+      <div style="display:grid; gap:10px;">
+        <input id="inpNick" placeholder="Nama panggilan / kode murid (contoh: Ahmad / M04)" />
+        <div class="grid-2">
+          <input id="inpClass" value="IV A" placeholder="Kelas" />
+          <input id="inpGroup" value="Kelompok 1" placeholder="Kelompok" />
+        </div>
+        <div><strong>Pilih Avatar:</strong></div>
+        <div class="grid-3">${avCards}</div>
+        <button class="btn btn-primary btn-block" onclick="startAdventure()">Mulai Petualangan Baligh!</button>
+      </div>
+    </div>
+
+    <div class="card" style="background:#FFF6E6; border-color:#D98218; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+      <div>
+        <strong>Area Khusus Guru PAI</strong><br>
+        <small>Dashboard hasil belajar offline, analisis soal, Modul Ajar, & Ekspor CSV (PIN awal: 4024).</small>
+      </div>
+      <button class="btn btn-secondary" onclick="currentView='teacher'; render();">Masuk Guru</button>
+    </div>
+  `;
+}
+
+function startAdventure() {
+  const nick = (document.getElementById("inpNick").value || "").trim() || ("Penjelajah-" + Math.floor(10 + Math.random()*89));
+  const cls = (document.getElementById("inpClass").value || "").trim() || "IV A";
+  const grp = (document.getElementById("inpGroup").value || "").trim() || "Kelompok 1";
+  const student = {
+    id: "MRD-" + Math.random().toString(36).substring(2, 8).toUpperCase(),
+    nickname: nick,
+    className: cls,
+    groupName: grp,
+    avatarId: window._pickedAv || "nara",
+    date: new Date().toLocaleDateString("id-ID"),
+    xp: 10,
+    completedPos: [],
+    badges: [],
+    diagnosticDone: false,
+    summativeDone: false,
+    reflectionDone: false
+  };
+  state.students.unshift(student);
+  state.activeStudentId = student.id;
+  saveState();
+  currentView = "map";
+  render();
+}
+
+function renderMap(root) {
+  const s = activeStudent();
+  if (!s) { currentView = "home"; render(); return; }
+  const pct = Math.round((s.completedPos.length / 5) * 100);
+  const allDone = s.completedPos.length >= 5 || state.settings.freeLearningMode;
+
+  const posHtml = POS_DATA.map(p => {
+    const done = s.completedPos.includes(p.num);
+    const unlocked = p.num === 1 || s.completedPos.includes(p.num - 1) || done || state.settings.freeLearningMode;
+    return `
+      <div class="card pos-card ${unlocked ? '' : 'locked'}" style="border-left-color:${p.color};">
+        <div>
+          <strong style="color:${p.color};">${p.title}</strong><br>
+          <small>${done ? "✅ Lencana: " + p.badge : (unlocked ? "Siap dijelajahi • Materi, Game & 5 Soal" : "🔒 Selesaikan Pos " + (p.num-1) + " dahulu")}</small>
+        </div>
+        <button class="btn ${done ? 'btn-outline' : 'btn-primary'}" style="${unlocked ? '' : 'pointer-events:none'}" ${unlocked ? '' : 'disabled'} onclick="activePos=${p.num}; posSubTab='materi'; currentView='pos'; render();">
+          ${done ? 'Buka' : 'Mulai'}
+        </button>
+      </div>
+    `;
+  }).join("");
+
+  root.innerHTML = `
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div>
+          <h2 style="margin:0; color:var(--primary);">Peta Misi • ${esc(s.nickname)}</h2>
+          <small>Kelas ${esc(s.className)} • ${s.completedPos.length}/5 Pos Selesai</small>
+        </div>
+        <button class="btn btn-outline" onclick="currentView='home'; render();">Beranda</button>
+      </div>
+      <div class="progress-bar" style="margin-top:10px;"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+
+    <div class="card" style="background:#FFF8EB; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+      <div>
+        <strong>Cek Pengetahuan Awal (Diagnostik 10 Soal)</strong><br>
+        <small>${s.diagnosticDone ? "✅ Sudah selesai (tidak ada hukuman nilai)" : "Kenali pemahaman awalmu sebelum memulai Pos 1."}</small>
+      </div>
+      <button class="btn btn-secondary" onclick="currentView='diagnostic'; render();">${s.diagnosticDone ? 'Ulang' : 'Mulai'}</button>
+    </div>
+
+    ${posHtml}
+
+    <div class="card" style="background:${allDone ? '#FFE8C2' : '#EFECE1'};">
+      <h3>Gerbang Akhir Petualangan</h3>
+      <p><small>${allDone ? 'Seluruh Pos siap! Kerjakan Kuis Akhir Sumatif (20 soal) dan lihat Sertifikat Digitalmu.' : 'Selesaikan Pos 1–5 terlebih dahulu untuk membuka Kuis Akhir.'}</small></p>
+      <div class="grid-2">
+        <button class="btn btn-primary" ${allDone ? '' : 'disabled'} onclick="currentView='summative'; render();">Kuis Akhir (20 Soal)</button>
+        <button class="btn btn-secondary" onclick="currentView='cert'; render();">Hasil & Sertifikat PDF</button>
+      </div>
+      <div class="grid-2" style="margin-top:8px;">
+        <button class="btn btn-outline" onclick="currentView='reflection'; render();">Refleksi Diri (6 Pertanyaan)</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderPos(root) {
+  const pos = POS_DATA.find(p => p.num === activePos);
+  const s = activeStudent();
+  let body = "";
+
+  if (posSubTab === "materi") {
+    body = `
+      <div class="card" style="background:${pos.color}15; border-color:${pos.color}44;">
+        <strong style="color:${pos.color};">Cerita Pembuka:</strong><br>${pos.story}
+      </div>
+      ${pos.cards.map((c, i) => `
+        <div class="card">
+          <h3 style="color:${pos.color};">${i+1}. ${c.t}</h3>
+          <p>${c.b}</p>
+        </div>
+      `).join("")}
+      <button class="btn btn-primary btn-block" onclick="posSubTab='game'; render();">Lanjut ke Mini-Game Seru</button>
+    `;
+  } else if (posSubTab === "game") {
+    body = renderPosGameHtml(pos) + `<button class="btn btn-primary btn-block" onclick="posSubTab='quiz'; render();">Lanjut ke Kuis Formatif (5 Soal)</button>`;
+  } else {
+    renderQuizView(root, `Formatif ${pos.title}`, FORMATIVE_QS[pos.num], "formative_" + pos.num, () => {
+      posSubTab = "materi"; currentView = "map"; render();
+    }, pos);
+    return;
+  }
+
+  root.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <h2 style="margin:0; color:${pos.color};">${pos.title}</h2>
+      <button class="btn btn-outline" onclick="currentView='map'; render();">Kembali ke Peta</button>
+    </div>
+    <div class="tabs">
+      <button class="tab ${posSubTab==='materi'?'active':''}" onclick="posSubTab='materi'; render();">1. Materi</button>
+      <button class="tab ${posSubTab==='game'?'active':''}" onclick="posSubTab='game'; render();">2. Mini-Game</button>
+      <button class="tab ${posSubTab==='quiz'?'active':''}" onclick="posSubTab='quiz'; render();">3. Kuis Formatif (5)</button>
+    </div>
+    ${body}
+  `;
+}
+
+function renderPosGameHtml(pos) {
+  if (pos.num === 1) {
+    return `
+      <div class="card">
+        <h3>${pos.gameTitle}</h3>
+        <p><small>Pilih pasangan pengertian yang tepat (+10 XP tiap benar):</small></p>
+        ${pos.pairs.map((p, i) => `
+          <div style="margin-bottom:10px;">
+            <strong>${p.term}</strong> ->
+            <select id="match_${i}" onchange="checkOfflineMatch(${i}, '${esc(p.def)}')">
+              <option value="">-- Pilih Pengertian --</option>
+              ${pos.pairs.map(x => `<option value="${esc(x.def)}">${x.def}</option>`).join("")}
+            </select>
+            <div id="mfb_${i}"></div>
+          </div>
+        `).join("")}
+      </div>`;
+  }
+  if (pos.num === 2) {
+    return `
+      <div class="card">
+        <h3>${pos.gameTitle}</h3>
+        ${pos.tfItems.map((it, i) => `
+          <div style="padding:10px 0; border-bottom:1px solid var(--border);">
+            <p style="margin:0 0 8px;">${i+1}. ${it.q}</p>
+            <button class="btn btn-outline" onclick="checkTF(${i}, true, ${it.a})">Benar</button>
+            <button class="btn btn-outline" onclick="checkTF(${i}, false, ${it.a})">Salah</button>
+            <div id="tf_${i}"></div>
+          </div>
+        `).join("")}
+      </div>`;
+  }
+  if (pos.num === 3) {
+    if (!window._stepOrder) window._stepOrder = [...pos.steps].sort(() => Math.random() - 0.5);
+    return `
+      <div class="card">
+        <h3>${pos.gameTitle}</h3>
+        <p><small>Gunakan panah untuk mengurutkan 5 langkah mandi wajib dari awal hingga akhir:</small></p>
+        ${window._stepOrder.map((st, i) => `
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px; padding:8px; border:1px solid var(--border); border-radius:12px;">
+            <strong style="color:var(--primary);">${i+1}.</strong>
+            <span style="flex:1;">${st}</span>
+            <button class="btn btn-outline" style="padding:4px 10px; min-height:36px;" ${i===0?'disabled':''} onclick="moveStep(${i},-1)">↑</button>
+            <button class="btn btn-outline" style="padding:4px 10px; min-height:36px;" ${i===window._stepOrder.length-1?'disabled':''} onclick="moveStep(${i},1)">↓</button>
+          </div>
+        `).join("")}
+        <button class="btn btn-secondary btn-block" onclick="checkStepOrder()">Periksa Urutan Mandi Wajib</button>
+        <div id="stepFb"></div>
+      </div>`;
+  }
+  if (pos.num === 4) {
+    return `
+      <div class="card">
+        <h3>${pos.gameTitle}</h3>
+        ${pos.scenarios.map((sc, i) => `
+          <div style="margin-bottom:14px;">
+            <p><strong>Situasi ${i+1}:</strong> ${sc.s}</p>
+            ${sc.opts.map((o, oi) => `<button class="option-btn" onclick="checkSc(${i}, ${oi}, ${sc.best}, this)">${o}</button>`).join("")}
+            <div id="sc_${i}"></div>
+          </div>
+        `).join("")}
+      </div>`;
+  }
+  return `
+    <div class="card">
+      <h3>${pos.gameTitle}</h3>
+      <p><small>Ketuk setiap sikap untuk mengaktifkannya (+5 XP per kartu):</small></p>
+      ${pos.attitudes.map((att, i) => `
+        <button class="option-btn" onclick="this.classList.add('correct'); addXpOnly(5); this.disabled=true;">✓ ${att}</button>
+      `).join("")}
+    </div>`;
+}
+
+function addXpOnly(delta) {
+  const s = activeStudent();
+  if (!s) return;
+  s.xp += delta;
+  saveState();
+}
+function checkOfflineMatch(i, target) {
+  const val = document.getElementById("match_"+i).value;
+  const fb = document.getElementById("mfb_"+i);
+  if (val === target) { fb.innerHTML = `<div class='feedback ok'>Tepat! (+10 XP)</div>`; addXpOnly(10); }
+  else if (val) { fb.innerHTML = `<div class='feedback warn'>Coba cek pengertian lain, tidak ada pengurangan poin!</div>`; }
+}
+function checkTF(i, picked, actual) {
+  const fb = document.getElementById("tf_"+i);
+  if (picked === actual) { fb.innerHTML = `<div class='feedback ok'>Benar sekali! (+10 XP)</div>`; addXpOnly(10); }
+  else { fb.innerHTML = `<div class='feedback warn'>Kurang tepat. Jawaban yang benar: ${actual ? 'Benar' : 'Salah'}.</div>`; }
+}
+function moveStep(i, dir) {
+  const arr = window._stepOrder;
+  const j = i + dir;
+  [arr[i], arr[j]] = [arr[j], arr[i]];
+  render();
+}
+function checkStepOrder() {
+  const target = POS_DATA[2].steps;
+  const ok = window._stepOrder.every((v, idx) => v === target[idx]);
+  const fb = document.getElementById("stepFb");
+  if (ok) { fb.innerHTML = `<div class='feedback ok'>Alhamdulillah! Semua urutan tepat (+30 XP)!</div>`; addXpOnly(30); }
+  else { fb.innerHTML = `<div class='feedback warn'>Masih ada langkah yang tertukar. Mulai dari Niat -> Cuci tangan -> Bersihkan kotoran -> Wudu -> Siram merata.</div>`; }
+}
+function checkSc(i, picked, best, btn) {
+  const fb = document.getElementById("sc_"+i);
+  if (picked === best) { btn.classList.add("correct"); fb.innerHTML = `<div class='feedback ok'>Keputusan aman dan tepat (+10 XP)!</div>`; addXpOnly(10); }
+  else { btn.classList.add("wrong"); fb.innerHTML = `<div class='feedback warn'>Pilih langkah yang menjaga keamanan dan kehormatan ya!</div>`; }
+}
+
+function renderQuizView(root, title, qs, mode, onDoneOverride, posObj) {
+  if (!window._qRun || window._qRun.mode !== mode) {
+    window._qRun = { mode, idx: 0, picked: null, answers: [] };
+  }
+  const run = window._qRun;
+  if (run.idx >= qs.length) {
+    const s = activeStudent();
+    const correctCount = run.answers.filter(a => a.ok).length;
+    const score = Math.round((correctCount / qs.length) * 100);
+    if (!run.saved) {
+      run.saved = true;
+      run.answers.forEach(a => state.answers.push({ ...a, studentId: s.id, nickname: s.nickname, className: s.className, mode }));
+      if (mode === "diag") {
+        s.diagnosticDone = true; s.xp += correctCount * 5 + 15;
+      } else if (mode.startsWith("formative_") && posObj) {
+        if (!s.completedPos.includes(posObj.num)) s.completedPos.push(posObj.num);
+        if (!s.badges.includes(posObj.badge)) s.badges.push(posObj.badge);
+        s.xp += correctCount * 10 + 10;
+        state.formativeResults.push({ studentId: s.id, nickname: s.nickname, pos: posObj.num, correct: correctCount, total: qs.length, score });
+      } else if (mode === "sum") {
+        s.summativeDone = true;
+        if (!s.badges.includes("Bintang Muslim Bertanggung Jawab")) s.badges.push("Bintang Muslim Bertanggung Jawab");
+        s.xp += correctCount * 10 + 25;
+        state.summativeResults.push({ studentId: s.id, nickname: s.nickname, className: s.className, score, kktp: state.settings.kktp, passed: score >= state.settings.kktp, date: new Date().toLocaleDateString("id-ID") });
+      }
+      saveState();
+    }
+    const passed = score >= state.settings.kktp;
+    root.innerHTML = `
+      <div class="card" style="text-align:center;">
+        <h2>${title} Selesai!</h2>
+        <div style="font-size:2.8rem; font-weight:800; color:${passed?'var(--green)':'var(--secondary)'};">${score}</div>
+        <p>Benar ${correctCount} dari ${qs.length} soal ${mode==='sum' ? `• Status: <strong>${passed ? 'Tuntas (KKTP ' + state.settings.kktp + ')' : 'Perlu Penguatan'}</strong>` : ''}</p>
+        ${posObj ? `<p class="pill pill-badge">Lencana Diraih: ${posObj.badge}</p><br><br>` : ''}
+        <button class="btn btn-primary btn-block" onclick="window._qRun=null; ${onDoneOverride ? "posSubTab='materi';" : ""} currentView='map'; render();">Kembali ke Peta</button>
+      </div>
+    `;
+    return;
+  }
+
+  const q = qs[run.idx];
+  const isShort = q.type === "short";
+  root.innerHTML = `
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong style="color:var(--primary);">${title}</strong>
+        <span>Soal ${run.idx + 1}/${qs.length}</span>
+      </div>
+      <div class="progress-bar" style="margin:8px 0 14px;"><div class="progress-fill" style="width:${((run.idx+1)/qs.length)*100}%"></div></div>
+      <h3>${q.q}</h3>
+      ${isShort ? `
+        <input id="shortAns" placeholder="Tulis jawaban singkat..." ${run.picked!==null?'disabled':''} value="${esc(run.picked||'')}" />
+        ${run.picked===null ? `<button class="btn btn-primary" style="margin-top:8px;" onclick="submitShortQuiz('${esc(q.ans)}', '${q.id}')">Kirim Jawaban</button>` : ''}
+      ` : q.opts.map(opt => {
+        let cls = "option-btn";
+        if (run.picked !== null) {
+          if (opt === q.ans) cls += " correct";
+          else if (opt === run.picked) cls += " wrong";
+        }
+        return `<button class="${cls}" ${run.picked!==null?'disabled':''} onclick="pickQuizOpt('${esc(opt)}', '${esc(q.ans)}', '${q.id}')">${opt}</button>`;
+      }).join("")}
+      ${run.picked !== null ? `
+        <div class="feedback ${run.picked.toLowerCase() === q.ans.toLowerCase() ? 'ok' : 'warn'}">
+          ${run.picked.toLowerCase() === q.ans.toLowerCase() ? 'Hebat! Jawabanmu benar.' : 'Belum tepat. Jawaban benar: ' + q.ans}
+        </div>
+        <button class="btn btn-primary btn-block" style="margin-top:10px;" onclick="window._qRun.idx++; window._qRun.picked=null; render();">Lanjut</button>
+      ` : ""}
+    </div>
+    <button class="btn btn-outline no-print" onclick="window._qRun=null; currentView='map'; render();">Batal / Kembali</button>
+  `;
+}
+
+function pickQuizOpt(opt, ans, qid) {
+  window._qRun.picked = opt;
+  window._qRun.answers.push({ qid, chosen: opt, ans, ok: opt.toLowerCase() === ans.toLowerCase() });
+  render();
+}
+function submitShortQuiz(ans, qid) {
+  const val = (document.getElementById("shortAns").value || "").trim();
+  if (!val) return;
+  pickQuizOpt(val, ans, qid);
+}
+
+function renderCertificate(root) {
+  const s = activeStudent();
+  if (!s) { currentView = "home"; render(); return; }
+  const sum = [...state.summativeResults].reverse().find(x => x.studentId === s.id);
+  root.innerHTML = `
+    <div class="cert-box">
+      <div style="color:var(--secondary); font-weight:800;">SERTIFIKAT PENGHARGAAN DIGITAL</div>
+      <h1 style="color:var(--primary); margin:6px 0;">PETUALANGAN BALIGH</h1>
+      <p>Diberikan kepada:</p>
+      <div style="font-size:2rem; font-weight:800; border-bottom:2px solid var(--secondary); display:inline-block; padding:0 24px 4px;">${esc(s.nickname)}</div>
+      <p>Kelas ${esc(s.className)} • ${esc(state.settings.schoolName)}</p>
+      <p>Telah menyelesaikan pembelajaran PAI Fase B:<br><strong>"Aku Siap Tumbuh Menjadi Muslim yang Bertanggung Jawab"</strong></p>
+      <p>Total: <strong>${s.xp} XP</strong> • Pos Selesai: <strong>${s.completedPos.length}/5</strong> ${sum ? `• Nilai Sumatif: <strong>${sum.score}</strong>` : ''}</p>
+      <p><small>Lencana: ${s.badges.length ? s.badges.join(" • ") : "Penjelajah Ilmu"}</small></p>
+      <p><small>Tanggal: ${s.date} • Pembimbing: ${esc(state.settings.teacherName)}</small></p>
+    </div>
+    <div class="grid-2 no-print" style="margin-top:14px;">
+      <button class="btn btn-primary" onclick="window.print()">Cetak / Simpan PDF Sertifikat</button>
+      <button class="btn btn-outline" onclick="currentView='map'; render();">Kembali ke Peta</button>
+    </div>
+  `;
+}
+
+function renderReflection(root) {
+  const s = activeStudent();
+  const qs = [
+    "1. Apa hal paling penting yang saya pelajari hari ini?",
+    "2. Materi pos mana yang paling mudah saya pahami?",
+    "3. Materi apa yang masih ingin saya pelajari?",
+    "4. Kebiasaan bersih apa yang akan saya lakukan mulai hari ini?",
+    "5. Bagaimana saya menghargai diri sendiri dan teman?",
+    "6. Siapa orang dewasa tepercaya yang dapat saya ajak bertanya?"
+  ];
+  root.innerHTML = `
+    <div class="card">
+      <h2 style="color:var(--primary);">Refleksi Diri Murid</h2>
+      <p><small>Pilih atau tulis jawabanmu secara santai dan aman (tanpa pertanyaan pribadi sensitif).</small></p>
+      ${qs.map((q, i) => `<div style="margin-bottom:10px;"><label><strong>${q}</strong></label><input id="ref_${i}" placeholder="Tulis refleksi singkatmu..." /></div>`).join("")}
+      <button class="btn btn-primary btn-block" onclick="saveOfflineReflection()">Simpan Refleksi (+15 XP)</button>
+    </div>
+    <button class="btn btn-outline" onclick="currentView='map'; render();">Kembali ke Peta</button>
+  `;
+}
+function saveOfflineReflection() {
+  const s = activeStudent();
+  const answers = [0,1,2,3,4,5].map(i => (document.getElementById("ref_"+i).value || "-").trim());
+  state.reflections.push({ studentId: s.id, nickname: s.nickname, date: new Date().toLocaleDateString("id-ID"), answers });
+  s.reflectionDone = true; s.xp += 15;
+  saveState();
+  alert("Terima kasih! Refleksimu tersimpan (+15 XP).");
+  currentView = "map"; render();
+}
+
+function renderTeacher(root) {
+  if (!teacherUnlocked) {
+    root.innerHTML = `
+      <div class="card" style="max-width:420px; margin:20px auto; text-align:center;">
+        <h2>Verifikasi Area Guru</h2>
+        <p><small>PIN bawaan: <strong>4024</strong> (dapat diubah di Pengaturan).</small></p>
+        <input id="pinIn" type="password" placeholder="Masukkan PIN Guru" />
+        <div style="display:flex; gap:8px; margin-top:12px;">
+          <button class="btn btn-outline" style="flex:1;" onclick="currentView='home'; render();">Batal</button>
+          <button class="btn btn-primary" style="flex:1;" onclick="verifyTeacherPin()">Masuk</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const avgSum = state.summativeResults.length ? Math.round(state.summativeResults.reduce((a,b)=>a+b.score,0)/state.summativeResults.length) : 0;
+  const passCount = state.summativeResults.filter(x => x.score >= state.settings.kktp).length;
+  const passPct = state.summativeResults.length ? Math.round((passCount * 100) / state.summativeResults.length) : 0;
+
+  root.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+      <h2 style="margin:0; color:var(--primary);">Dashboard Guru (Mode Offline)</h2>
+      <button class="btn btn-outline" onclick="teacherUnlocked=false; currentView='home'; render();">Keluar Guru</button>
+    </div>
+    <div class="tabs">
+      <button class="tab ${teacherTab==='ringkasan'?'active':''}" onclick="teacherTab='ringkasan'; render();">Ringkasan & Murid</button>
+      <button class="tab ${teacherTab==='pengaturan'?'active':''}" onclick="teacherTab='pengaturan'; render();">Pengaturan, CSV & Backup</button>
+    </div>
+    ${teacherTab === 'ringkasan' ? `
+      <div class="grid-3">
+        <div class="card"><strong>Total Murid</strong><h2>${state.students.length}</h2></div>
+        <div class="card"><strong>Rata-rata Sumatif</strong><h2>${avgSum}</h2></div>
+        <div class="card"><strong>Ketuntasan (KKTP ${state.settings.kktp})</strong><h2>${passPct}%</h2></div>
+      </div>
+      <div class="card">
+        <h3>Daftar Hasil Murid</h3>
+        <table>
+          <thead><tr><th>Nama Panggilan</th><th>Kelas</th><th>Pos</th><th>XP</th><th>Nilai Sumatif</th></tr></thead>
+          <tbody>
+            ${state.students.map(st => {
+              const sum = [...state.summativeResults].reverse().find(x => x.studentId === st.id);
+              return `<tr><td>${esc(st.nickname)}</td><td>${esc(st.className)}</td><td>${st.completedPos.length}/5</td><td>${st.xp}</td><td>${sum ? sum.score : '-'}</td></tr>`;
+            }).join("") || `<tr><td colspan="5">Belum ada data murid.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    ` : `
+      <div class="card" style="display:grid; gap:10px;">
+        <h3>Pengaturan Kelas & KKTP</h3>
+        <input id="setSchool" value="${esc(state.settings.schoolName)}" placeholder="Nama Sekolah" />
+        <input id="setTeacher" value="${esc(state.settings.teacherName)}" placeholder="Nama Guru" />
+        <input id="setKktp" type="number" value="${state.settings.kktp}" placeholder="KKTP" />
+        <label style="display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="setFree" style="width:auto;" ${state.settings.freeLearningMode ? 'checked' : ''} />
+          Mode Bebas Belajar (Buka semua pos tanpa urutan)
+        </label>
+        <button class="btn btn-primary" onclick="saveTeacherSet()">Simpan Pengaturan</button>
+        <hr />
+        <div class="grid-2">
+          <button class="btn btn-secondary" onclick="downloadOfflineCsv()">Unduh Rekap CSV (Excel)</button>
+          <button class="btn btn-outline" onclick="window.print()">Cetak Laporan PDF</button>
+        </div>
+        <button class="btn btn-danger" onclick="if(confirm('Hapus semua data murid offline di browser ini?')){ state.students=[]; state.answers=[]; state.formativeResults=[]; state.summativeResults=[]; state.reflections=[]; saveState(); render(); }">Reset Data Sesi Offline</button>
+      </div>
+    `}
+  `;
+}
+
+function verifyTeacherPin() {
+  if (document.getElementById("pinIn").value === state.settings.teacherPin) {
+    teacherUnlocked = true; render();
+  } else alert("PIN tidak sesuai!");
+}
+function saveTeacherSet() {
+  state.settings.schoolName = document.getElementById("setSchool").value.trim() || "SD Negeri Nusantara";
+  state.settings.teacherName = document.getElementById("setTeacher").value.trim() || "Guru PAI";
+  state.settings.kktp = Math.max(40, Math.min(100, Number(document.getElementById("setKktp").value) || 75));
+  state.settings.freeLearningMode = document.getElementById("setFree").checked;
+  saveState();
+  alert("Pengaturan berhasil disimpan secara offline!");
+}
+function downloadOfflineCsv() {
+  const rows = ["ID Murid,Nama Panggilan,Kelas,Kelompok,XP,Pos Selesai,Nilai Sumatif,Status"];
+  state.students.forEach(st => {
+    const sum = [...state.summativeResults].reverse().find(x => x.studentId === st.id);
+    rows.push([st.id, st.nickname, st.className, st.groupName, st.xp, st.completedPos.length + "/5", sum ? sum.score : "-", sum ? (sum.passed ? "Tuntas" : "Pendampingan") : "Belum"].map(v => `"${String(v).replace(/"/g,'""')}"`).join(","));
+  });
+  const blob = new Blob([rows.join("\n")], { type: "text/csv;charset=utf-8;" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "rekap_petualangan_baligh_offline.csv";
+  a.click();
+}
+function esc(s) { return String(s || "").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "name": "Petualangan Baligh",
+  "description": "Media pembelajaran interaktif PAI Kelas 4 SD Fase B tema Memasuki Usia Baligh dengan 5 pos petualangan, 8+ mini-game edukatif, asesmen diagnostik/formatif/sumatif, dashboard guru, dan integrasi Google Sheets.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
